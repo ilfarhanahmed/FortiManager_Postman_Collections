@@ -1,0 +1,587 @@
+{
+  "info": {
+    "_postman_id": "a1d9c58f-3b45-4f44-a2e3-db03c6c6580e",
+    "name": "SDWAN_Template",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "30322334"
+  },
+  "item": [
+    {
+      "name": "FMG_Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let responseData=pm.response.json();\r",
+              "pm.collectionVariables.set(\"session\", responseData.session);"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": 1,\r\n    \"method\": \"exec\",\r\n    \"params\": [{\r\n        \"data\": {\r\n            \"user\": \"{{ADMIN_USER}}\",\r\n            \"passwd\": \"{{PASSWORD}}\"\r\n        },\r\n        \"url\": \"/sys/login/user\"\r\n    }]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "add sd-wan temp",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"method\": \"set\",\r\n    \"params\": [\r\n        {\r\n            \"data\": {\r\n                \"name\": \"{{TEMPLATE_NAME}}\",\r\n                \"type\": \"wanprof\"\r\n            },\r\n            \"url\": \"/pm/wanprof/adom/{{ADOM}}\"\r\n        }\r\n    ],\r\n    \"session\": \"{{session}}\",\r\n    \"id\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create_zone",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"method\": \"set\",\r\n  \"params\": [\r\n    {\r\n      \"data\": [\r\n        {\r\n          \"name\": \"{{SDWAN_ZONE}}\",\r\n          \"service-sla-tie-break\": \"cfg-order\"\r\n        }\r\n      ],\r\n      \"url\": \"/pm/config/adom/{{ADOM}}/wanprof/{{TEMPLATE_NAME}}/system/sdwan/zone\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\",\r\n  \"id\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "add_sdwan_member",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"method\": \"set\",\r\n  \"params\": [\r\n    {\r\n      \"data\": [\r\n        {\r\n                    \"seq-num\": 1,\r\n                    \"interface\": [\r\n                        \"{{SDWAN_MEMBER_1}}\"\r\n                    ],\r\n                    \"zone\": [\r\n                        \"{{SDWAN_ZONE}}\"\r\n                    ],\r\n                    \"gateway\": \"0.0.0.0\",\r\n                    \"source\": \"0.0.0.0\",\r\n                    \"gateway6\": \"::\",\r\n                    \"source6\": \"::\",\r\n                    \"cost\": 0,\r\n                    \"weight\": 1,\r\n                    \"priority\": 1,\r\n                    \"spillover-threshold\": 0,\r\n                    \"ingress-spillover-threshold\": 0,\r\n                    \"volume-ratio\": 1,\r\n                    \"status\": 1,\r\n                    \"priority6\": 1024\r\n        },\r\n        {\r\n                    \"seq-num\": 2,\r\n                    \"interface\": [\r\n                        \"{{SDWAN_MEMBER_2}}\"\r\n                    ],\r\n                    \"zone\": [\r\n                        \"{{SDWAN_ZONE}}\"\r\n                    ],\r\n                    \"gateway\": \"0.0.0.0\",\r\n                    \"source\": \"0.0.0.0\",\r\n                    \"gateway6\": \"::\",\r\n                    \"source6\": \"::\",\r\n                    \"cost\": 0,\r\n                    \"weight\": 1,\r\n                    \"priority\": 1,\r\n                    \"spillover-threshold\": 0,\r\n                    \"ingress-spillover-threshold\": 0,\r\n                    \"volume-ratio\": 1,\r\n                    \"status\": 1,\r\n                    \"priority6\": 1024\r\n        }\r\n      ],\r\n      \"url\": \"/pm/config/adom/{{ADOM}}/wanprof/{{TEMPLATE_NAME}}/system/sdwan/members\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\",\r\n  \"id\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "healthcheck_sdwan",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"method\": \"set\",\r\n    \"params\": [\r\n        {\r\n            \"data\": [\r\n                {\r\n                    \"sla\": [\r\n                        {\r\n                            \"id\": 1,\r\n                            \"jitter-threshold\": 50,\r\n                            \"latency-threshold\": 250,\r\n                            \"link-cost-factor\": [\r\n                                \"latency\",\r\n                                \"jitter\",\r\n                                \"packet-loss\"\r\n                            ],\r\n                            \"mos-threshold\": \"3.6\",\r\n                            \"packetloss-threshold\": 5,\r\n                            \"priority-in-sla\": 0,\r\n                            \"priority-out-sla\": 0\r\n                        }\r\n                    ],\r\n                    \"name\": \"{{SDWAN_SLA}}\",\r\n                    \"probe-packets\": \"enable\",\r\n                    \"addr-mode\": \"ipv4\",\r\n                    \"system-dns\": \"disable\",\r\n                    \"server\": [\r\n                        \"{{DNS_SERVER}}\"\r\n                    ],\r\n                    \"protocol\": \"http\",\r\n                    \"port\": 0,\r\n                    \"ha-priority\": 1,\r\n                    \"http-get\": \"/\",\r\n                    \"http-agent\": \"Chrome/ Safari/\",\r\n                    \"dns-request-domain\": \"www.example.com\",\r\n                    \"interval\": 1000,\r\n                    \"probe-timeout\": 1000,\r\n                    \"failtime\": 5,\r\n                    \"recoverytime\": 10,\r\n                    \"probe-count\": 30,\r\n                    \"diffservcode\": \"000000\",\r\n                    \"update-cascade-interface\": \"enable\",\r\n                    \"update-static-route\": \"enable\",\r\n                    \"sla-fail-log-period\": 0,\r\n                    \"sla-pass-log-period\": 0,\r\n                    \"threshold-warning-packetloss\": 0,\r\n                    \"threshold-alert-packetloss\": 0,\r\n                    \"threshold-warning-latency\": 0,\r\n                    \"threshold-alert-latency\": 0,\r\n                    \"threshold-warning-jitter\": 0,\r\n                    \"threshold-alert-jitter\": 0,\r\n                    \"members\": [],\r\n                    \"quality-measured-method\": \"half-open\",\r\n                    \"ftp-mode\": \"passive\",\r\n                    \"dns-match-ip\": \"0.0.0.0\",\r\n                    \"detect-mode\": \"active\",\r\n                    \"mos-codec\": \"g711\",\r\n                    \"vrf\": 0,\r\n                    \"source\": \"0.0.0.0\",\r\n                    \"embed-measured-health\": \"disable\",\r\n                    \"sla-id-redistribute\": 0\r\n                }\r\n            ],\r\n            \"url\": \"/pm/config/adom/{{ADOM}}/wanprof/{{TEMPLATE_NAME}}/system/sdwan/health-check\"\r\n        }\r\n    ],\r\n    \"session\": \"{{session}}\",\r\n    \"id\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "service(rule)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"method\": \"set\",\r\n    \"params\": [\r\n        {\r\n            \"data\": [\r\n                {\r\n                    \"id\": 1,\r\n                    \"name\": \"{{SDWAN_RULE_1}}\",\r\n                    \"addr-mode\": \"ipv4\",\r\n                    \"input-device\": [],\r\n                    \"input-device-negate\": \"disable\",\r\n                    \"mode\": \"manual\",\r\n                    \"role\": \"standalone\",\r\n                    \"standalone-action\": \"disable\",\r\n                    \"tos\": \"0x00\",\r\n                    \"tos-mask\": \"0x00\",\r\n                    \"protocol\": 0,\r\n                    \"start-port\": 1,\r\n                    \"end-port\": 65535,\r\n                    \"dst\": [\r\n                        \"{{DST_ADDR}}\"\r\n                    ],\r\n                    \"dst-negate\": \"disable\",\r\n                    \"src\": [\r\n                        \"{{SRC_ADDR}}\"\r\n                    ],\r\n                    \"src-negate\": \"disable\",\r\n                    \"users\": [],\r\n                    \"groups\": [],\r\n                    \"internet-service\": \"disable\",\r\n                    \"link-cost-threshold\": 10,\r\n                    \"hold-down-time\": 0,\r\n                    \"dscp-forward\": \"disable\",\r\n                    \"dscp-reverse\": \"disable\",\r\n                    \"priority-members\": [],\r\n                    \"status\": \"enable\",\r\n                    \"gateway\": \"disable\",\r\n                    \"default\": \"disable\",\r\n                    \"tie-break\": \"zone\",\r\n                    \"use-shortcut-sla\": \"enable\",\r\n                    \"priority-zone\": [\r\n                        \"{{SDWAN_ZONE}}\"\r\n                    ],\r\n                    \"passive-measurement\": \"disable\",\r\n                    \"internet-service-app-ctrl-category\": [],\r\n                    \"input-zone\": [],\r\n                    \"agent-exclusive\": \"disable\",\r\n                    \"shortcut\": \"enable\",\r\n                    \"load-balance\": \"disable\",\r\n                    \"zone-mode\": \"disable\",\r\n                    \"start-src-port\": 1,\r\n                    \"end-src-port\": 65535,\r\n                    \"shortcut-priority\": \"auto\"\r\n                }\r\n            ],\r\n            \"url\": \"/pm/config/adom/root/wanprof/{{TEMPLATE_NAME}}/system/sdwan/service/\"\r\n        }\r\n    ],\r\n    \"session\": \"{{session}}\",\r\n    \"id\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "neighbor",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"method\": \"set\",\r\n    \"params\": [\r\n        {\r\n            \"data\": [\r\n                {\r\n                    \"ip\": [\r\n                        \"{{NEIGHBOR_IP}}\"\r\n                    ],\r\n                    \"_dynamic_neighbor\": [],\r\n                    \"member\": [\r\n                        \"2\"\r\n                    ],\r\n                    \"role\": \"standalone\",\r\n                    \"health-check\": [\r\n                        \"{{SDWAN_SLA}}\"\r\n                    ],\r\n                    \"sla-id\": 1,\r\n                    \"mode\": \"sla\",\r\n                    \"minimum-sla-meet-members\": 1\r\n                }\r\n            ],\r\n            \"url\": \"/pm/config/adom/root/wanprof/{{TEMPLATE_NAME}}/system/sdwan/neighbor\"\r\n        }\r\n    ],\r\n    \"session\": \"{{session}}\",\r\n    \"id\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "duplication",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"method\": \"set\",\r\n  \"params\": [\r\n    {\r\n      \"data\": [\r\n                {\r\n                    \"id\": 1,\r\n                    \"srcaddr\": [\r\n                        \"{{SRC_ADDR}}\"\r\n                    ],\r\n                    \"dstaddr\": [\r\n                        \"{{DST_ADDR}}\"\r\n                    ],\r\n                    \"srcaddr6\": [],\r\n                    \"dstaddr6\": [],\r\n                    \"srcintf\": [\r\n                        \"{{SRC_INTF}}\"\r\n                    ],\r\n                    \"dstintf\": [\r\n                        \"{{DST_INTF}}\"\r\n                    ],\r\n                    \"service\": [\r\n                        \"{{ALLOWED_SERVICE_1}}\",\r\n                        \"{{ALLOWED_SERVICE_2}}\"\r\n                    ],\r\n                    \"packet-duplication\": \"disable\",\r\n                    \"packet-de-duplication\": \"enable\",\r\n                    \"service-id\": [],\r\n                    \"sla-match-service\": \"disable\"\r\n                }\r\n      ],\r\n      \"url\": \"/pm/config/adom/root/wanprof/{{TEMPLATE_NAME}}/system/sdwan/duplication\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\",\r\n  \"id\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "assign_template",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"method\": \"update\",\r\n    \"params\": [\r\n        {\r\n            \"data\": [\r\n                {\r\n                    \"name\": \"{{DEVICE}}\",\r\n                    \"vdom\": \"{{VDOM}}\"\r\n                }\r\n            ],\r\n            \"url\": \"/pm/wanprof/adom/{{ADOM}}/{{TEMPLATE_NAME}}/scope member\"\r\n        }\r\n    ],\r\n    \"session\": \"{{session}}\",\r\n    \"id\": 1,\r\n    \"verbose\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET - Template Data",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();\r",
+              "const sdwan = response.result[0].data;\r",
+              "\r",
+              "// SD-WAN Members\r",
+              "const members = sdwan.members.map(m => ({\r",
+              "    interface: m.interface[0],\r",
+              "    priority: m.priority,\r",
+              "    weight: m.weight,\r",
+              "    status: m.status,\r",
+              "    zone: m.zone.join(\", \")\r",
+              "}));\r",
+              "\r",
+              "// Health Checks\r",
+              "const healthChecks = sdwan[\"health-check\"].map(h => ({\r",
+              "    name: h.name,\r",
+              "    server: h.server?.join(\", \") || \"N/A\",\r",
+              "    protocol: h.protocol || \"N/A\",\r",
+              "    latencyThreshold: h.sla?.[0]?.[\"latency-threshold\"] ?? \"N/A\",\r",
+              "    jitterThreshold: h.sla?.[0]?.[\"jitter-threshold\"] ?? \"N/A\",\r",
+              "    packetlossThreshold: h.sla?.[0]?.[\"packetloss-threshold\"] ?? \"N/A\"\r",
+              "}));\r",
+              "\r",
+              "// Services\r",
+              "const services = sdwan.service.map(s => ({\r",
+              "    name: s.name,\r",
+              "    dst: s.dst.join(\", \"),\r",
+              "    src: s.src.join(\", \"),\r",
+              "    loadBalance: s[\"load-balance\"],\r",
+              "    shortcut: s.shortcut\r",
+              "}));\r",
+              "\r",
+              "// Neighbors\r",
+              "const neighbors = sdwan.neighbor.map(n => ({\r",
+              "    ip: n.ip?.join(\", \") || \"N/A\",\r",
+              "    mode: n.mode,\r",
+              "    role: n.role,\r",
+              "    member: n.member?.join(\", \"),\r",
+              "    slaId: n[\"sla-id\"] || \"N/A\",\r",
+              "    healthCheck: n[\"health-check\"]?.join(\", \") || \"N/A\"\r",
+              "}));\r",
+              "\r",
+              "// Duplication rules\r",
+              "const duplications = sdwan.duplication.map(d => ({\r",
+              "    id: d.id,\r",
+              "    srcIntf: d.srcintf.join(\", \"),\r",
+              "    dstIntf: d.dstintf.join(\", \"),\r",
+              "    srcAddr: d.srcaddr.join(\", \"),\r",
+              "    dstAddr: d.dstaddr.join(\", \"),\r",
+              "    service: d.service.join(\", \"),\r",
+              "    packetDuplication: d[\"packet-duplication\"],\r",
+              "    packetDeDuplication: d[\"packet-de-duplication\"]\r",
+              "}));\r",
+              "\r",
+              "// Visualizer output\r",
+              "pm.visualizer.set(`\r",
+              "<style>\r",
+              "    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }\r",
+              "    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }\r",
+              "    th { background-color: #f2f2f2; }\r",
+              "    h2 { margin-top: 30px; }\r",
+              "</style>\r",
+              "\r",
+              "<h2>SD-WAN Members</h2>\r",
+              "<table>\r",
+              "  <tr><th>Interface</th><th>Priority</th><th>Weight</th><th>Status</th><th>Zone</th></tr>\r",
+              "  {{#each members}}\r",
+              "    <tr>\r",
+              "      <td>{{interface}}</td>\r",
+              "      <td>{{priority}}</td>\r",
+              "      <td>{{weight}}</td>\r",
+              "      <td>{{status}}</td>\r",
+              "      <td>{{zone}}</td>\r",
+              "    </tr>\r",
+              "  {{/each}}\r",
+              "</table>\r",
+              "\r",
+              "<h2>Health Checks</h2>\r",
+              "<table>\r",
+              "  <tr><th>Name</th><th>Server</th><th>Protocol</th><th>Latency</th><th>Jitter</th><th>Packet Loss</th></tr>\r",
+              "  {{#each healthChecks}}\r",
+              "    <tr>\r",
+              "      <td>{{name}}</td>\r",
+              "      <td>{{server}}</td>\r",
+              "      <td>{{protocol}}</td>\r",
+              "      <td>{{latencyThreshold}}</td>\r",
+              "      <td>{{jitterThreshold}}</td>\r",
+              "      <td>{{packetlossThreshold}}</td>\r",
+              "    </tr>\r",
+              "  {{/each}}\r",
+              "</table>\r",
+              "\r",
+              "<h2>SD-WAN Services</h2>\r",
+              "<table>\r",
+              "  <tr><th>Name</th><th>Destination</th><th>Source</th><th>Load Balance</th><th>Shortcut</th></tr>\r",
+              "  {{#each services}}\r",
+              "    <tr>\r",
+              "      <td>{{name}}</td>\r",
+              "      <td>{{dst}}</td>\r",
+              "      <td>{{src}}</td>\r",
+              "      <td>{{loadBalance}}</td>\r",
+              "      <td>{{shortcut}}</td>\r",
+              "    </tr>\r",
+              "  {{/each}}\r",
+              "</table>\r",
+              "\r",
+              "<h2>SD-WAN Neighbors</h2>\r",
+              "<table>\r",
+              "  <tr><th>IP</th><th>Mode</th><th>Role</th><th>Member</th><th>SLA ID</th><th>Health Check</th></tr>\r",
+              "  {{#each neighbors}}\r",
+              "    <tr>\r",
+              "      <td>{{ip}}</td>\r",
+              "      <td>{{mode}}</td>\r",
+              "      <td>{{role}}</td>\r",
+              "      <td>{{member}}</td>\r",
+              "      <td>{{slaId}}</td>\r",
+              "      <td>{{healthCheck}}</td>\r",
+              "    </tr>\r",
+              "  {{/each}}\r",
+              "</table>\r",
+              "\r",
+              "<h2>Duplication Rules</h2>\r",
+              "<table>\r",
+              "  <tr><th>ID</th><th>Source Interface</th><th>Destination Interface</th><th>Source Address</th><th>Destination Address</th><th>Service</th><th>Duplication</th><th>De-Duplication</th></tr>\r",
+              "  {{#each duplications}}\r",
+              "    <tr>\r",
+              "      <td>{{id}}</td>\r",
+              "      <td>{{srcIntf}}</td>\r",
+              "      <td>{{dstIntf}}</td>\r",
+              "      <td>{{srcAddr}}</td>\r",
+              "      <td>{{dstAddr}}</td>\r",
+              "      <td>{{service}}</td>\r",
+              "      <td>{{packetDuplication}}</td>\r",
+              "      <td>{{packetDeDuplication}}</td>\r",
+              "    </tr>\r",
+              "  {{/each}}\r",
+              "</table>\r",
+              "`, {\r",
+              "    members,\r",
+              "    healthChecks,\r",
+              "    services,\r",
+              "    neighbors,\r",
+              "    duplications\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"method\": \"get\",\r\n  \"params\": [\r\n    {\r\n      \r\n     \"url\": \"/pm/config/adom/{{ADOM}}/wanprof/{{TEMPLATE_NAME}}/system/sdwan\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\",\r\n  \"id\": 1,\r\n  \"verbose\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/jsonrpc",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "jsonrpc"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": "FMG IP address",
+      "type": "string"
+    },
+    {
+      "key": "DEVICE",
+      "value": "FortiGate Device Name",
+      "type": "string"
+    },
+    {
+      "key": "VDOM",
+      "value": "FGT VDOM",
+      "type": "string"
+    },
+    {
+      "key": "TEMPLATE_NAME",
+      "value": "Template Name",
+      "type": "string"
+    },
+    {
+      "key": "ADMIN_USER",
+      "value": "FMG Admin User",
+      "type": "string"
+    },
+    {
+      "key": "PASSWORD",
+      "value": "FMG Admin Password",
+      "type": "string"
+    },
+    {
+      "key": "ADOM",
+      "value": "FMG ADOM",
+      "type": "string"
+    },
+    {
+      "key": "session",
+      "value": "= LEAVE BLANK = ",
+      "type": "string"
+    },
+    {
+      "key": "SDWAN_ZONE",
+      "value": "SDWAN Zone",
+      "type": "string"
+    },
+    {
+      "key": "SDWAN_MEMBER_1",
+      "value": "SDWAN Zone Member Interface - example: wan1",
+      "type": "string"
+    },
+    {
+      "key": "SDWAN_MEMBER_2",
+      "value": "SDWAN Zone Member Interface - example: wan2",
+      "type": "string"
+    },
+    {
+      "key": "DNS_SERVER",
+      "value": "DNS Server IP - example: 8.8.8.8",
+      "type": "string"
+    },
+    {
+      "key": "SDWAN_SLA",
+      "value": "Healthcheck SLA Name",
+      "type": "string"
+    },
+    {
+      "key": "SDWAN_RULE_1",
+      "value": "SDWAN Rule",
+      "type": "string"
+    },
+    {
+      "key": "NEIGHBOR_IP",
+      "value": "SDWAN Neighbor IP",
+      "type": "string"
+    },
+    {
+      "key": "SRC_ADDR",
+      "value": "Used in SDWAN Rule - example: all",
+      "type": "string"
+    },
+    {
+      "key": "DST_ADDR",
+      "value": "Used in SDWAN Rule - example: gmail.com",
+      "type": "string"
+    },
+    {
+      "key": "SRC_INTF",
+      "value": "Used in SDWAN Duplication - example: port8",
+      "type": "string"
+    },
+    {
+      "key": "DST_INTF",
+      "value": "Used in SDWAN Duplication - example: port2",
+      "type": "string"
+    },
+    {
+      "key": "ALLOWED_SERVICE_1",
+      "value": "Used in SDWAN Duplication - example: DHCP",
+      "type": "string"
+    },
+    {
+      "key": "ALLOWED_SERVICE_2",
+      "value": "Can add multiple services",
+      "type": "string"
+    }
+  ]
+}
