@@ -1,1 +1,418 @@
-
+{
+  "info": {
+    "_postman_id": "0ab0374e-3643-4eac-b292-17d2811d3002",
+    "name": "SDWAN_Overlay",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "30322334"
+  },
+  "item": [
+    {
+      "name": "FMG_Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const csrfToken = pm.cookies.get(\"HTTP_CSRF_TOKEN\");\r",
+              "pm.collectionVariables.set(\"csrf_token\", csrfToken);"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"url\": \"/gui/userauth\",\r\n    \"method\": \"login\",\r\n    \"params\": {\r\n        \"username\": \"{{ADMIN_USER}}\",\r\n        \"secretkey\": \"{{PASSWORD}}\",\r\n        \"logintype\": 0\r\n    }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/cgi-bin/module/flatui_auth",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "cgi-bin",
+            "module",
+            "flatui_auth"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Enable SDWAN Manager on Device",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "{{csrf_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": \"1\",\r\n    \"verbose\": 1,\r\n    \"method\": \"update\",\r\n    \"params\": [\r\n        {\r\n            \"url\": \"/dvmdb/adom/{{ADOM}}/device/{{DEVICE}}\",\r\n            \"data\": {\r\n                \"flags\": [\r\n                    \"sdwan_management\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/cgi-bin/module/flatui/json",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "cgi-bin",
+            "module",
+            "flatui",
+            "json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ADD - SDWAN_OT",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-type": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "{{csrf_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"method\": \"add\",\r\n    \"verbose\": 1,\r\n    \"params\": [\r\n        {\r\n            \"url\": \"/pm/template/_sdwan_overlay/adom/{{ADOM}}\",\r\n            \"data\": {\r\n                \"name\": \"{{TEMPLATE_NAME}}\",\r\n                \"type\": \"template\",\r\n                \"template setting\": {\r\n                    \"stype\": \"_sdwan_overlay\",\r\n                    \"description\": \"{{DESCRIPTION}}\"\r\n                }\r\n            }\r\n        }\r\n    ],\r\n    \"id\": \"2\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/cgi-bin/module/flatui/json",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "cgi-bin",
+            "module",
+            "flatui",
+            "json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "SET - SDWAN_OT_Details",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "{{csrf_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": \"3\",\r\n    \"verbose\": 1,\r\n    \"method\": \"set\",\r\n    \"params\": [\r\n        {\r\n            \"url\": \"/pm/config/adom/{{ADOM}}/template/_sdwan_overlay/{{TEMPLATE_NAME}}/sdwan/overlay\",\r\n            \"data\": {\r\n                \"name\": \"{{TEMPLATE_NAME}}\",\r\n                \"authmethod\": \"psk\",\r\n                \"topology\": \"single-hub\",\r\n                \"loopback-ip\": \"172.16.0.0/255.255.0.0\",\r\n                \"overlay-network\": \"10.10.0.0/255.255.0.0\",\r\n                \"as\": 65000,\r\n                \"route_reflection\": \"disable\",\r\n                \"edge-route-map-in\": [],\r\n                \"edge-route-map-out\": [],\r\n                \"sdwan_template\": null,\r\n                \"router_template\": null,\r\n                \"sdwan_members\": \"disable\",\r\n                \"sdwan_health_check\": \"disable\",\r\n                \"auto-branch-id-assignment\": \"enable\",\r\n                \"hub-number\": 1,\r\n                \"bgp_on_loopback\": \"disable\",\r\n                \"dynamic_bgp\": \"disable\",\r\n                \"advpn\": \"disable\",\r\n                \"hub_sdwan_template\": null,\r\n                \"normalized-interface\": \"disable\",\r\n                \"nodes\": [\r\n                    {\r\n                        \"_scope\": {\r\n                            \"name\": \"{{DEVICE}}\",\r\n                            \"vdom\": \"{{VDOM}}\"\r\n                        },\r\n                        \"underlay\": [\r\n                            {\r\n                                \"cost\": 0,\r\n                                \"id\": 1,\r\n                                \"interface\": \"{{HUB_UNDERLAY_INTERFACE}}\",\r\n                                \"private-link\": \"disable\",\r\n                                \"override-ip\": \"disable\",\r\n                                \"ip\": null\r\n                            }\r\n                        ],\r\n                        \"advertisement\": \"connected\",\r\n                        \"role\": \"hub\",\r\n                        \"hub-role\": \"standalone\",\r\n                        \"prefix\": [],\r\n                        \"neighbor\": null,\r\n                        \"neighbor-group\": null,\r\n                        \"vrf\": null,\r\n                        \"id\": 1\r\n                    },\r\n                    {\r\n                        \"_scope\": {\r\n                            \"name\": \"{{DEVICE_GROUP}}\",\r\n                            \"is group\": 1\r\n                        },\r\n                        \"underlay\": [\r\n                            {\r\n                                \"cost\": 0,\r\n                                \"id\": 1,\r\n                                \"interface\": \"{{SPOKE_UNDERLAY_INTERFACE}}\",\r\n                                \"private-link\": \"disable\",\r\n                                \"override-ip\": \"disable\",\r\n                                \"transport-group\": 0,\r\n                                \"ip\": null\r\n                            }\r\n                        ],\r\n                        \"advertisement\": \"connected\",\r\n                        \"role\": \"spoke\",\r\n                        \"interface\": [],\r\n                        \"neighbor\": [\r\n                            {\r\n                                \"route-map-in\": null,\r\n                                \"route-map-out\": null,\r\n                                \"route-map-out-preferable\": null,\r\n                                \"apply-to-all\": 0\r\n                            }\r\n                        ],\r\n                        \"vrf\": [],\r\n                        \"id\": 2\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/cgi-bin/module/flatui/json",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "cgi-bin",
+            "module",
+            "flatui",
+            "json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "EXE - SDWAN_OT",
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "{{csrf_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": \"4\",\r\n    \"method\": \"exec\",\r\n    \"params\": [\r\n        {\r\n            \"url\": \"/pm/config/adom/{{ADOM}}/_sdwan/overlay/orchestration\",\r\n            \"data\": {\r\n                \"template\": \"{{TEMPLATE_NAME}}\"\r\n            }\r\n        }\r\n    ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/cgi-bin/module/flatui/json",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "cgi-bin",
+            "module",
+            "flatui",
+            "json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET - SDWAN_OT",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();\r",
+              "\r",
+              "let htmlContent = `\r",
+              "<h2>SD-WAN Overlay Configuration</h2>\r",
+              "<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">\r",
+              "    <thead>\r",
+              "        <tr>\r",
+              "            <th>Node Name</th>\r",
+              "            <th>Node Role</th>\r",
+              "            <th>Advertisement</th>\r",
+              "            <th>Interfaces</th>\r",
+              "            <th>Underlay Interface</th>\r",
+              "            <th>Neighbor IP</th>\r",
+              "            <th>Remote AS</th>\r",
+              "        </tr>\r",
+              "    </thead>\r",
+              "    <tbody>\r",
+              "`;\r",
+              "\r",
+              "const overlayData = response.data?.result?.[0]?.data;\r",
+              "if (overlayData?.nodes) {\r",
+              "    overlayData.nodes.forEach(node => {\r",
+              "        const scope = node._scope?.[0] || {};\r",
+              "        const nodeName = scope.name || \"N/A\";\r",
+              "        const nodeRole = node.role === 0 ? \"Hub\" : \"Branch\";\r",
+              "        const advertisement = node.advertisement ? \"Yes\" : \"No\";\r",
+              "\r",
+              "        const interfaces = node.interface?.join(\", \") || \"None\";\r",
+              "\r",
+              "        const underlayInterface = node.underlay?.map(u => u.interface).join(\", \") || \"None\";\r",
+              "\r",
+              "        const neighbor = node.neighbor?.[0];\r",
+              "        const neighborIP = neighbor?.ip || \"None\";\r",
+              "        const remoteAS = neighbor?.[\"remote-as\"] || \"None\";\r",
+              "\r",
+              "        htmlContent += `\r",
+              "        <tr>\r",
+              "            <td>${nodeName}</td>\r",
+              "            <td>${nodeRole}</td>\r",
+              "            <td>${advertisement}</td>\r",
+              "            <td>${interfaces}</td>\r",
+              "            <td>${underlayInterface}</td>\r",
+              "            <td>${neighborIP}</td>\r",
+              "            <td>${remoteAS}</td>\r",
+              "        </tr>\r",
+              "        `;\r",
+              "    });\r",
+              "} else {\r",
+              "    htmlContent += `<tr><td colspan=\"7\">No nodes found</td></tr>`;\r",
+              "}\r",
+              "\r",
+              "htmlContent += `\r",
+              "    </tbody>\r",
+              "</table>\r",
+              "<br>\r",
+              "<strong>Overlay Network:</strong> ${overlayData[\"overlay-network\"]?.[0] || \"N/A\"} / ${overlayData[\"overlay-network\"]?.[1] || \"\"}\r",
+              "<br>\r",
+              "<strong>Loopback IP:</strong> ${overlayData[\"loopback-ip\"]?.[0] || \"N/A\"} / ${overlayData[\"loopback-ip\"]?.[1] || \"\"}\r",
+              "`;\r",
+              "\r",
+              "pm.visualizer.set(htmlContent);\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {}
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "XSRF-TOKEN",
+            "value": "{{csrf_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"method\": \"get\",\r\n    \"params\": [\r\n        {\r\n            \"url\": \"/pm/config/adom/{{ADOM}}/template/_sdwan_overlay/{{TEMPLATE_NAME}}/sdwan/overlay\"\r\n        }\r\n    ],\r\n    \"id\": \"5\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://{{host}}/cgi-bin/module/flatui/json",
+          "protocol": "https",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "cgi-bin",
+            "module",
+            "flatui",
+            "json"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": "FMG IP address"
+    },
+    {
+      "key": "DEVICE",
+      "value": "HUB FGT"
+    },
+    {
+      "key": "VDOM",
+      "value": "HUB FGT VDOM"
+    },
+    {
+      "key": "TEMPLATE_NAME",
+      "value": "Overlay Template Name"
+    },
+    {
+      "key": "DESCRIPTION",
+      "value": "Overlay Template Description"
+    },
+    {
+      "key": "DEVICE_GROUP",
+      "value": "Spoke Branches Device Group"
+    },
+    {
+      "key": "ADMIN_USER",
+      "value": "FMG Admin User"
+    },
+    {
+      "key": "PASSWORD",
+      "value": "FMG Admin Password"
+    },
+    {
+      "key": "csrf_token",
+      "value": "= LEAVE BLANK = "
+    },
+    {
+      "key": "ADOM",
+      "value": "FMG ADOM"
+    },
+    {
+      "key": "HUB_UNDERLAY_INTERFACE",
+      "value": "HUB underlay interface - metavariable can be used."
+    },
+    {
+      "key": "SPOKE_UNDERLAY_INTERFACE",
+      "value": "SPOKE underlay interface - metavariable can be used."
+    }
+  ]
+}
