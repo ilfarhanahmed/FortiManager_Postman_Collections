@@ -1,3 +1,3 @@
-This lists all the FortiMangaer Postman Collections JSON files.
+This lists all the Postman Collections.
 
-https://www.postman.com/ilfarhanahmed/fortimanager-public/overview
+https://www.postman.com/ilfarhanahmed/
