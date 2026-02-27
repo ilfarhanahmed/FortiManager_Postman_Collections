@@ -1,0 +1,529 @@
+{
+  "info": {
+    "_postman_id": "333aa4fc-f665-460e-89ca-d80d50ca55a2",
+    "name": "Policy_Hit_Count",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "30322334"
+  },
+  "item": [
+    {
+      "name": "METHOD_1_Refresh_Hit",
+      "item": [
+        {
+          "name": "FMG_LOGIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let responseData=pm.response.json();\r",
+                  "pm.collectionVariables.set(\"session\", responseData.session);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 1,\r\n    \"method\": \"exec\",\r\n    \"params\": [{\r\n        \"data\": {\r\n            \"user\": \"{{ADMIN}}\",\r\n            \"passwd\": \"{{PASSWORD}}\"\r\n        },\r\n        \"url\": \"/sys/login/user\"\r\n    }]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{host}}/jsonrpc",
+              "protocol": "https",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "jsonrpc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh_Counter_ADOM",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "let taskValue = response.result[0].data.task;\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"TASK\", taskValue);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"id\": 1,\r\n  \"method\": \"exec\",\r\n  \"params\": [\r\n    {\r\n      \"data\": {\r\n        \"adom\": \"{{ADOM}}\",\r\n        \"pkg\": \"{{PACKAGE}}\"\r\n      },\r\n      \"url\": \"/sys/hitcount\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{host}}/jsonrpc",
+              "protocol": "https",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "jsonrpc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Monitor_the_task",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"id\": 7,\r\n  \"method\": \"get\",\r\n  \"params\": [\r\n    {\r\n      \"url\": \"/task/task/{{TASK}}\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\",\r\n  \"verbose\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{host}}/jsonrpc",
+              "protocol": "https",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "jsonrpc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hit_count-Collect_task_result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse response\r",
+                  "let response = pm.response.json();\r",
+                  "let policies = response.result[0].data[\"firewall policy\"];\r",
+                  "\r",
+                  "// Prepare table rows\r",
+                  "let tableRows = policies.map(policy => {\r",
+                  "    return `\r",
+                  "        <tr>\r",
+                  "            <td>${policy.policyid}</td>\r",
+                  "            <td>${policy.name}</td>\r",
+                  "            <td>${policy.hitcount}</td>\r",
+                  "        </tr>\r",
+                  "    `;\r",
+                  "}).join(\"\");\r",
+                  "\r",
+                  "// Create the complete HTML for visualization\r",
+                  "let html = `\r",
+                  "    <style>\r",
+                  "        table {\r",
+                  "            width: 100%;\r",
+                  "            border-collapse: collapse;\r",
+                  "            font-family: Arial, sans-serif;\r",
+                  "        }\r",
+                  "        th, td {\r",
+                  "            border: 1px solid #ccc;\r",
+                  "            padding: 6px 10px;\r",
+                  "            text-align: left;\r",
+                  "        }\r",
+                  "        th {\r",
+                  "            background-color: #f5f5f5;\r",
+                  "        }\r",
+                  "    </style>\r",
+                  "    <table>\r",
+                  "        <thead>\r",
+                  "            <tr>\r",
+                  "                <th>Policy ID</th>\r",
+                  "                <th>Policy Name</th>\r",
+                  "                <th>Hit Count</th>\r",
+                  "            </tr>\r",
+                  "        </thead>\r",
+                  "        <tbody>\r",
+                  "            ${tableRows}\r",
+                  "        </tbody>\r",
+                  "    </table>\r",
+                  "`;\r",
+                  "\r",
+                  "// Set visualization\r",
+                  "pm.visualizer.set(html);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"id\": 4,\r\n  \"method\": \"exec\",\r\n  \"params\": [\r\n    {\r\n      \"data\": {\r\n        \"taskid\": {{TASK}}\r\n      },\r\n      \"url\": \"/sys/task/result\"\r\n    }\r\n  ],\r\n  \"session\": \"{{session}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{host}}/jsonrpc",
+              "protocol": "https",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "jsonrpc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "FMG logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// test logout success\r",
+                  "pm.test(\"Login successfull\", () => {\r",
+                  "    let code = pm.response.json()['result'][0]['status']['code'];\r",
+                  "    let msg = pm.response.json()['result'][0]['status']['message'];\r",
+                  "\r",
+                  "    if (code == 0) {\r",
+                  "        pm.visualizer.set(\"<html><body><span style='color:green'>Logout successful</span></body></html>\");\r",
+                  "    } else {\r",
+                  "        pm.visualizer.set(\"<html><body><span style='color:red'>Cannot logout: \"+ msg +\"</span></body></html>\");\r",
+                  "    }\r",
+                  "\r",
+                  "    pm.expect(code).to.eq(0, msg);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 1,\r\n    \"method\": \"exec\",\r\n    \"params\": [\r\n        {\r\n            \"url\": \"/sys/logout\"\r\n        }\r\n    ],\r\n    \"session\": \"{{session}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{host}}/jsonrpc",
+              "protocol": "https",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "jsonrpc"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "METHOD_2_PROXY",
+      "item": [
+        {
+          "name": "FMG_LOGIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let responseData=pm.response.json();\r",
+                  "pm.collectionVariables.set(\"session\", responseData.session);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 1,\r\n    \"method\": \"exec\",\r\n    \"params\": [{\r\n        \"data\": {\r\n            \"user\": \"{{ADMIN}}\",\r\n            \"passwd\": \"{{PASSWORD}}\"\r\n        },\r\n        \"url\": \"/sys/login/user\"\r\n    }]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{host}}/jsonrpc",
+              "protocol": "https",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "jsonrpc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Policy_hit_count using proxy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = pm.response.json();\r",
+                  "let firewallPolicies = {};\r",
+                  "\r",
+                  "if (\r",
+                  "    json.result &&\r",
+                  "    Array.isArray(json.result) &&\r",
+                  "    json.result[0].data &&\r",
+                  "    Array.isArray(json.result[0].data)\r",
+                  ") {\r",
+                  "    json.result[0].data.forEach(firewall => {\r",
+                  "        const firewallName = firewall.target || \"Unknown\";\r",
+                  "        const policies = firewall?.response?.results;\r",
+                  "\r",
+                  "        if (!policies || !Array.isArray(policies)) {\r",
+                  "            console.warn(`No policies found for ${firewallName}`);\r",
+                  "            return;\r",
+                  "        }\r",
+                  "\r",
+                  "        if (!firewallPolicies[firewallName]) {\r",
+                  "            firewallPolicies[firewallName] = [];\r",
+                  "        }\r",
+                  "\r",
+                  "        policies.forEach(policy => {\r",
+                  "            firewallPolicies[firewallName].push({\r",
+                  "                PolicyID: policy.policyid,\r",
+                  "                PolicyName: `Policy-${policy.policyid}`,\r",
+                  "                HitCount: policy.hit_count\r",
+                  "            });\r",
+                  "        });\r",
+                  "    });\r",
+                  "}\r",
+                  "\r",
+                  "// Build HTML visualization\r",
+                  "let html = `\r",
+                  "    <style>\r",
+                  "        body { font-family: Arial, sans-serif; }\r",
+                  "        h3 { margin-top: 30px; }\r",
+                  "        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }\r",
+                  "        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }\r",
+                  "        th { background-color: #f4f4f4; }\r",
+                  "    </style>\r",
+                  "`;\r",
+                  "\r",
+                  "if (Object.keys(firewallPolicies).length > 0) {\r",
+                  "    Object.keys(firewallPolicies).forEach(fw => {\r",
+                  "        html += `<h3>Firewall: ${fw}</h3>`;\r",
+                  "        html += `\r",
+                  "            <table>\r",
+                  "                <tr>\r",
+                  "                    <th>Policy ID</th>\r",
+                  "                    <th>Hit Count</th>\r",
+                  "                </tr>\r",
+                  "        `;\r",
+                  "        firewallPolicies[fw].forEach(policy => {\r",
+                  "            html += `\r",
+                  "                <tr>\r",
+                  "                    <td>${policy.PolicyID}</td>\r",
+                  "                    <td>${policy.HitCount}</td>\r",
+                  "                </tr>\r",
+                  "            `;\r",
+                  "        });\r",
+                  "        html += `</table>`;\r",
+                  "    });\r",
+                  "} else {\r",
+                  "    html += `<p>No policy data found or parsed.</p>`;\r",
+                  "}\r",
+                  "\r",
+                  "pm.visualizer.set(html);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"method\": \"exec\",\r\n    \"params\": [\r\n        {\r\n            \"url\": \"sys/proxy/json\",\r\n            \"data\": {\r\n                \"target\": [\r\n                    \"adom/root/device/{{DEVICE_1}}\"\r\n                ],\r\n                \"action\": \"get\",\r\n                \"resource\": \"/api/v2/monitor/firewall/policy\"\r\n            }\r\n        }\r\n    ],\r\n    \"id\": \"1\",\r\n    \"session\":\"{{session}}\",\r\n    \"verbose\": 1\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{host}}/jsonrpc",
+              "protocol": "https",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "jsonrpc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "FMG logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// test logout success\r",
+                  "pm.test(\"Login successfull\", () => {\r",
+                  "    let code = pm.response.json()['result'][0]['status']['code'];\r",
+                  "    let msg = pm.response.json()['result'][0]['status']['message'];\r",
+                  "\r",
+                  "    if (code == 0) {\r",
+                  "        pm.visualizer.set(\"<html><body><span style='color:green'>Logout successful</span></body></html>\");\r",
+                  "    } else {\r",
+                  "        pm.visualizer.set(\"<html><body><span style='color:red'>Cannot logout: \"+ msg +\"</span></body></html>\");\r",
+                  "    }\r",
+                  "\r",
+                  "    pm.expect(code).to.eq(0, msg);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 1,\r\n    \"method\": \"exec\",\r\n    \"params\": [\r\n        {\r\n            \"url\": \"/sys/logout\"\r\n        }\r\n    ],\r\n    \"session\": \"{{session}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{host}}/jsonrpc",
+              "protocol": "https",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "jsonrpc"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": "FMG IP address",
+      "type": "string"
+    },
+    {
+      "key": "session",
+      "value": "= LEAVE BLANK =",
+      "type": "string"
+    },
+    {
+      "key": "ADOM",
+      "value": "FMG ADOM",
+      "type": "string"
+    },
+    {
+      "key": "DEVICE_1",
+      "value": "FortiGate Name",
+      "type": "string"
+    },
+    {
+      "key": "PACKAGE",
+      "value": "Policy Package Name",
+      "type": "string"
+    },
+    {
+      "key": "TASK",
+      "value": "= LEAVE BLANK =",
+      "type": "string"
+    },
+    {
+      "key": "ADMIN",
+      "value": "FMG Admin User",
+      "type": "string"
+    },
+    {
+      "key": "PASSWORD",
+      "value": "FMG Admin Password",
+      "type": "string"
+    }
+  ]
+}
